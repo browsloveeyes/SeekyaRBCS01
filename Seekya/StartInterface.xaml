@@ -1,0 +1,16 @@
+﻿<Window x:Class="Seekya.StartInterface"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="" Height="256" Width="535" AllowsTransparency="True" WindowStartupLocation="CenterScreen" WindowStyle="None" Background="{x:Null}">
+    <Grid Height="217" Width="495" Margin="0">
+        <Label Height="28" HorizontalAlignment="Left" Margin="41,109,0,0" Name="lbBar" VerticalAlignment="Top" Width="155" />
+        <ProgressBar Height="27" HorizontalAlignment="Center" Margin="0,141,0,0" Name="pbBar" VerticalAlignment="Top" Width="414" />
+        <Label Content="红细胞寿命测定呼气试验仪" Height="43" HorizontalAlignment="Center" Margin="105,26,101,0" Name="label1" VerticalAlignment="Top" Width="289" FontSize="22" FontWeight="Bold" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="180,62,0,0" Name="textBlock1" Text="ELS-TESTER" VerticalAlignment="Top" FontSize="20" FontWeight="Normal" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="187,90,0,0" Name="textBlock2" Text="版本：V1.3版" VerticalAlignment="Top" FontSize="16" FontFamily="STZhongsong" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="379,114,0,0" Name="textBlock3" Text="初始化.." VerticalAlignment="Top" />
+        <Grid.Background>
+            <ImageBrush ImageSource="/Seekya;component/Images/启动界面背景图片.png" />
+        </Grid.Background>
+    </Grid>
+</Window>
