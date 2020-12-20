@@ -1,0 +1,12 @@
+﻿<Window x:Class="Seekya.hbInputDbManager"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="hbInputDbManager" Height="202" Width="415" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+    <Grid>
+        <Label Content="请输入血红蛋白浓度 " Height="38" HorizontalAlignment="Left" Margin="19,42,0,0" Name="label1" VerticalAlignment="Top" FontSize="16" />
+        <TextBox Height="23" HorizontalAlignment="Left" Margin="180,47,0,0" Name="tboxhb" VerticalAlignment="Top" Width="120" FontSize="16" />
+        <Button Content="确认" Height="30" HorizontalAlignment="Left" Margin="170,91,0,0" Name="button1" VerticalAlignment="Top" Width="62" Click="button1_Click" FontSize="16" />
+        <Label Content="g/L" Height="38" HorizontalAlignment="Left" Margin="309,42,0,0" Name="label2" VerticalAlignment="Top" FontSize="16" />
+
+    </Grid>
+</Window>

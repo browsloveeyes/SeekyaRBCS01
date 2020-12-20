@@ -1,0 +1,79 @@
+﻿<Window x:Class="Seekya.dbManager"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        Title="数据库管理" Height="453" Width="1075" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" ResizeMode="NoResize" UseLayoutRounding="False" Closed="Window_Closed" Topmost="False">
+    <Grid Background="#FFF0F0F0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="85"/>
+            <ColumnDefinition Width="667"/>
+            <ColumnDefinition Width="*"/>         
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="170"/>
+                <RowDefinition Height="190"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0">
+                <GroupBox Header="查找" Height="122" HorizontalAlignment="Center"  Name="groupBox1" Margin="0,10,0,10" Width="260">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Height="24" HorizontalAlignment="Left" Name="textBlock2" Text="姓名" Width="30" Margin="20,0,10,0"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Height="24" HorizontalAlignment="Left" Name="textBlock1" Text="住院号" Width="50" Margin="20,0,10,0"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Height="23" HorizontalAlignment="Left" Name="tBoxName" VerticalAlignment="Center" Width="93" />
+                        <TextBox Grid.Row="1" Grid.Column="1" Height="23" HorizontalAlignment="Left" Name="tBoxNumber" VerticalAlignment="Center" Width="94" />
+                        <Button Grid.Row="1" Grid.Column="2" Content="搜索" Height="23" HorizontalAlignment="Right" Name="btnSearch" VerticalAlignment="Top" Margin="0,13,10,0" Width="47" Click="btnSearch_Click" />
+                    </Grid>
+                </GroupBox>
+            </Border>
+            <Border Grid.Row="1">
+                <GroupBox Grid.Row="1" Header="管理员" Height="153" Name="groupBox2" Margin="0,10,0,10" Width="260">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Content="验证管理员" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Height="16" HorizontalAlignment="Left" Name="chBoxVerifyAdmin" VerticalAlignment="Center"  Click="chBoxVerifyAdmin_Click" Margin="5,10,5,5"/>
+                        <Button Content="修改密码" Grid.Row="1" Grid.Column="0" Height="32" Name="btnModifyPwd" HorizontalAlignment="Center" VerticalAlignment="Center" Width="75" Click="btnModifyPwd_Click" />
+                        <Button Content="删除记录" Grid.Row="1" Grid.Column="1" Height="32" HorizontalAlignment="Center" Name="btnDeleteRecord" VerticalAlignment="Center" Width="75" Click="btnDeleteRecord_Click" />
+                        <Button Content="更改记录" Grid.Row="1" Grid.Column="2" Height="32" HorizontalAlignment="Center" Name="btnChangeRecord" VerticalAlignment="Center" Width="75" Click="btnChangeRecord_Click" />
+                        <Button Content="插入记录" Grid.Row="2" Grid.Column="0" Height="32" HorizontalAlignment="Center" Name="btnInsertRecord" VerticalAlignment="Center" Width="75" Click="btnInsertRecord_Click" />
+                        <Button Content="删除表" Grid.Row="2" Grid.Column="1" Height="32" HorizontalAlignment="Center" Name="btnDeleteTable" VerticalAlignment="Center" Width="75" Click="btnDeleteTable_Click" />
+                        <Button Content="主界面刷新" Grid.Row="2" Grid.Column="2" Height="32" HorizontalAlignment="Center" Name="btnRefresh" VerticalAlignment="Center" Width="75" Click="btnRefresh_Click" />
+                    </Grid>
+                </GroupBox>
+            </Border>
+            <Border Grid.Row="2">
+                <Button Content="打印" Height="23" HorizontalAlignment="Right" Name="btnPrint" VerticalAlignment="Top" Width="75" Click="btnPrint_Click" Margin="20,5,20,20" />
+            </Border>
+        </Grid>
+        <Grid Grid.Column="0">
+            <WindowsFormsHost Height="395" HorizontalAlignment="Left" Margin="5,5,0,0" Name="windowsFormsHost1" VerticalAlignment="Top" Width="85" Background="White">
+                <wf:DataGridView x:Name="dataGridViewTablesList" RowHeadersVisible="False" Margin="0,0,0,0" BackgroundColor="White" ColumnHeadersHeightSizeMode="DisableResizing" RowHeadersWidthSizeMode="DisableResizing" ReadOnly="True" AllowUserToAddRows="False" AllowUserToDeleteRows="False" AllowUserToResizeColumns="False" AllowUserToResizeRows="False" CellClick="dataGridViewTablesList_CellClick" BorderStyle="Fixed3D">
+                </wf:DataGridView>
+            </WindowsFormsHost>
+        </Grid>
+        <Grid Grid.Column="1">
+            <WindowsFormsHost Height="395" HorizontalAlignment="Left" Margin="0,5,0,0" Name="windowsFormsHost2" VerticalAlignment="Top" Width="667" Background="White" >
+                <wf:DataGridView x:Name="dataGridViewTable" Margin="0,0,0,0" RowHeadersVisible="False" AllowUserToAddRows="False" BackgroundColor="White" AllowUserToDeleteRows="False" AllowUserToResizeColumns="False" AllowUserToResizeRows="False" ColumnHeadersHeightSizeMode="DisableResizing" ReadOnly="True" RowHeadersWidthSizeMode="DisableResizing" BorderStyle="Fixed3D">
+                </wf:DataGridView>
+            </WindowsFormsHost>
+        </Grid>
+        
+    </Grid>
+</Window>
