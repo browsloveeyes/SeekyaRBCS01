@@ -1,0 +1,87 @@
+﻿<Window x:Class="Seekya.QC"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="质控界面" Height="530" Width="420" Loaded="Window_Loaded" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
+    <Grid Background="#FFF0F0F0">
+        <TabControl Height="480" HorizontalAlignment="Left" Margin="12,0,0,0" Name="tabControl1" VerticalAlignment="Top" Width="393" SelectionChanged="tabControl1_SelectionChanged">
+            <TabItem Name="tabItem1" Header="质控" Width="195">
+                <Grid >
+                    <GroupBox Header="输入信息" Height="105" HorizontalAlignment="Left" Margin="18,15,0,0" Name="groupBox1" VerticalAlignment="Top" Width="350">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Column="0" Grid.Row="0" Margin="25,20,0,0">测试气A的CO浓度差值</TextBlock>
+                            <TextBlock Grid.Column="0" Grid.Row="1" Margin="25,10,10,10">测试气A的CO₂浓度值</TextBlock>
+                            <TextBox Grid.Column="1" Grid.Row="0" Name="co" Margin="10,20,0,0"></TextBox>
+                            <TextBox Grid.Column="1" Grid.Row="1" Name="co2" Margin="10,10,0,10"></TextBox>
+                            <TextBlock Grid.Column="2" Grid.Row="0" Margin="15,20,0,0">ppm</TextBlock>
+                            <TextBlock Grid.Column="2" Grid.Row="1" Margin="15,10,10,10">%</TextBlock>
+                        </Grid>                        
+                    </GroupBox>
+                    <GroupBox Header="结果" Height="144" HorizontalAlignment="Left" Margin="18,130,0,0" Name="groupBox2" VerticalAlignment="Top" Width="350">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Column="0" Grid.Row="0" Margin="25,20,0,0">相对精密度</TextBlock>
+                            <TextBlock Grid.Column="0" Grid.Row="1" Margin="25,10,10,10">相对准确度</TextBlock>
+                            <TextBlock Grid.Column="0" Grid.Row="2" Margin="25,0,0,20">质控结果</TextBlock>
+                            <TextBox Grid.Column="1" Grid.Row="0" Name="precision" Margin="10,20,0,0" IsReadOnly="False"></TextBox>
+                            <TextBox Grid.Column="1" Grid.Row="1" Name="accuracy" Margin="10,10,0,10" IsReadOnly="False"></TextBox>
+                            <TextBox Grid.Column="1" Grid.Row="2" Name="result" Margin="10,0,0,20" IsReadOnly="False"></TextBox>
+                            <TextBlock Grid.Column="2" Grid.Row="0" Margin="15,20,0,0">%</TextBlock>
+                            <TextBlock Grid.Column="2" Grid.Row="1" Margin="15,10,10,10">%</TextBlock>
+                        </Grid>
+                    </GroupBox>
+                    <GridSplitter Height="5" Margin="0,287,0,161" HorizontalAlignment="Stretch"/>
+                    <GroupBox Header="进度" Height="146" HorizontalAlignment="Left" Margin="18,300,0,0" Name="groupBox3" VerticalAlignment="Top" Width="350">
+                        <Grid>
+                            <TextBox Height="101" HorizontalAlignment="Left" Margin="15,8,0,0" Name="textBox1" VerticalAlignment="Top" Width="222" IsReadOnly="True" />
+                            <Button Content="质 控" Height="28" HorizontalAlignment="Left" Margin="258,37,0,0" Name="button1" VerticalAlignment="Top" Width="61" FontWeight="Bold" Click="button1_Click" />
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+            <TabItem Name="tabItem2" Header="历史记录" Width="194" >
+                <Grid >
+                    <DataGrid AutoGenerateColumns="False" Height="416" HorizontalAlignment="Left" Margin="3,8,0,0" Name="dataGridQcRecord" VerticalAlignment="Top" Width="380" IsReadOnly="True" HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF7F7F7" VerticalContentAlignment="Center">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="{x:Type DataGridRow}">
+                                <Style.Triggers>
+                                    <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                                        <Setter Property="Background" Value="#FFE4DDB3" />
+                                    </Trigger>
+                                    <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                        <Setter Property="Background" Value="#FFF2F2F2" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="时间" Binding="{Binding Time}"/>
+                            <DataGridTextColumn Header="相对精密度(%)" Binding="{Binding Precision}"/>
+                            <DataGridTextColumn Header="相对准确度(%)" Binding="{Binding Accuracy}"/>
+                            <DataGridTextColumn Header="质控结果" Binding="{Binding Result}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+     
+
+    </Grid>
+</Window>
