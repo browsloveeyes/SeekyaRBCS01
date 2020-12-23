@@ -198,7 +198,7 @@ namespace Seekya
             cell.SetCellValue(remark2);
             #endregion
 
-            if (number > 1)
+            if (number > 1&&number<10)
             {
                 for (int w = 0; w < number; w++)
                 {

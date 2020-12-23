@@ -1,7 +1,12 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="uri:settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Seekya.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Seekya_WebReference_WSInterface" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://168.2.5.28:1506/services/WSInterface.WSInterfaceHttpSoap11Endpoint</Value>
+    </Setting>
+    <Setting Name="Seekya_WebReference1_WSInterface" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://168.2.5.26:1506/services/WSInterface.WSInterfaceHttpSoap11Endpoint</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

@@ -136,10 +136,11 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="0.5*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Grid.Row="0" Margin="15,8,20,8" FontWeight="Bold" FontSize="16" FontFamily="宋体" UseLayoutRounding="True">检验条形码</TextBlock>
+                        <TextBlock Grid.Column="0" Grid.Row="0" Margin="15,8,20,8" FontSize="20" FontFamily="宋体" UseLayoutRounding="True" Text="唯一ID" Foreground="#FFB93E1C" FontWeight="Bold"/>
+                        <!--<ComboBox x:Name="Idselected" Grid.Column="0"  Width="80" Margin="15,8,20,8" FontWeight="Bold" FontSize="12" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>-->
                         <TextBox Grid.Column="1" Grid.Row="0" Width="300" Name="tBoxScanBar" HorizontalAlignment="Left" Margin="5,5,0,5" FontSize="14" Grid.RowSpan="1" Grid.ColumnSpan="2"></TextBox>
-                        <ComboBox x:Name="Patient_type" Grid.Column="3 " Width="60" Height="25" Margin="6,0,0,0" FontWeight="Bold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-                        <Button Grid.Column="4" Name="scanBarOk" Width="80" Height="25" Margin="-160,7,0,3" Content="确认" FontSize="12" UseLayoutRounding="True" IsDefault="true" Click="scanBarOk_Click" FontWeight="Bold"></Button>
+                        <ComboBox x:Name="Patient_type" Grid.Column="3 " Width="60" Height="25" Margin="6,0,0,0" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                        <Button Grid.Column="4" Name="scanBarOk" Width="80" Height="25" Margin="-180,7,0,3" Content="确认" FontSize="12" UseLayoutRounding="True" IsDefault="true" Click="scanBarOk_Click" FontWeight="Bold" Background="#FF1CCEED"></Button>
                         
                         <TextBlock Grid.Column="0" Grid.Row="1" Margin="15,8,20,8" FontWeight="Bold" FontSize="16" FontFamily="宋体" UseLayoutRounding="True">姓名</TextBlock>
                         <TextBox Grid.Column="1" Grid.Row="1" Width="150" Name="name" HorizontalAlignment="Left" Margin="5,5,0,5" FontSize="14"></TextBox>

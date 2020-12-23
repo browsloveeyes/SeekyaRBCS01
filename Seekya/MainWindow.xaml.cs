@@ -75,9 +75,6 @@ namespace Seekya
         //定义一个空的数据库管理窗口类
         dbManager myDb = null;
 
-        //定义一个空的申请单详情窗口类
-        ApplyFormsDetails applyformsDetails = null;
-
         //存储血红蛋白浓度
         public string rbcon = null;
 
@@ -85,7 +82,6 @@ namespace Seekya
         public bool qcOpen = false;
         public bool cfgOpen = false;
         public bool dbOpen = false;
-        public bool apfmOpen = false;
 
         public static bool qcOpend = false;
 
@@ -98,7 +94,7 @@ namespace Seekya
         //信息来源医院后台的患者数目
         int num = -1;
         //是否存在记录未获得后台血红蛋白
-        bool websign = true;
+        bool websign = false;
         //判断是否记录临时红细胞寿命的标志，在调用医院后台数据的时候为true,测量完毕为false
         bool wsn = false;
         //使用调用医院后台功能时以血红蛋白为100记录临时红细胞寿命
@@ -110,20 +106,17 @@ namespace Seekya
         //upload到医院后台的数据
         string[] resultlist = new string[20];
 
-        //记录血红蛋白为0时的三个接口信息体
-        string[] zeroRecords = new string[3]; 
-
         //判断office是否可用
         public bool officeavailable = false;
 
 
         //报告内容字段
-        ////病人id
-        //public string PatientId = null;
-        ////病人住院号
-        //public string VisitNo = null;
-        ////报告编号
-        //public string HisNo = null;
+        //病人id
+        public string PatientId = null;
+        //病人住院号
+        public string VisitNo = null;
+        //报告编号
+        public string HisNo = null;
         //患者姓名
         public string PatientName = null;
         //病人类型
@@ -133,24 +126,6 @@ namespace Seekya
 
         //患者唯一id
         public string scanBarCode = null;
-
-        //申请单数据包
-        public string ApplyForms = null;
-        //申请单号
-        public string apfm = null;
-        //病人ID
-        public string ptID = null;
-        //住院号
-        public string ptnb = null;
-        //项目代码
-        public string imcd = null;
-        //项目名称
-        public string imnm = null;
-        //申请时间
-        public string aptm = null;
-
-        ////患者类型：住院/门诊/体检
-        //public string p_type = "I";
 
         public MainWindow()
         {
@@ -548,6 +523,10 @@ namespace Seekya
             Patient_type.Items.Add("体检");
             Patient_type.SelectedIndex = 0;
 
+            //Idselected.Items.Add("病人卡号");
+            //Idselected.Items.Add("住院号");
+            //Idselected.SelectedIndex = 0;
+
             //创建线程，监听连接仪器的串口
             Thread tCom = new Thread(ListenCom);
             tCom.IsBackground = true;
@@ -635,30 +614,25 @@ namespace Seekya
                 {
                     if (websign)
                     {
-                        string pathStringCom = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\scan.txt";
-                        //scanBarCode = tBoxScanBar.Text;
-                        try
-                        {
-                            //FileStream fs1 = new FileStream(pathString, FileMode.Open, FileAccess.ReadWrite);
-                            StreamReader sr = new StreamReader(pathStringCom, Encoding.GetEncoding("gb2312"));
+                        //string pathStringCom = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\scan.txt";
+                        ////scanBarCode = tBoxScanBar.Text;
+                        //try
+                        //{
+                        //    //FileStream fs1 = new FileStream(pathString, FileMode.Open, FileAccess.ReadWrite);
+                        //    StreamReader sr = new StreamReader(pathStringCom, Encoding.GetEncoding("gb2312"));
+                        //    sr.ReadLine();
+                        //    //读入医院代码以及url
+                        //    hosCode = sr.ReadLine();  ///*定位数据库中患者的某属性，如住院号，在demo中设为access表名*/
+                        //    url = sr.ReadLine();
+                            url = "http://168.2.5.28:1506/services/WSInterface?wsdl";
+                        //    sr.Close();
+                        //    //fs1.Close();
+                        //}
+                        //catch (Exception ex)
+                        //{
+                        //    // System.Windows.MessageBox.Show("ERROR:" + ex.Message);
+                        //}
 
-                            sr.ReadLine();
-
-                            //读入医院代码以及url
-                            hosCode = sr.ReadLine();  ///*定位数据库中患者的某属性，如住院号，在demo中设为access表名*/
-                            url = sr.ReadLine();
-                            //url = "http://168.2.5.28:1506/services/WSInterface?wsdl";  FJ
-                            url = "http://192.168.31.164/Webservice1.asmx?wsdl";
-
-                            sr.Close();
-                            //fs1.Close();
-
-                        }
-                        catch (Exception ex)
-                        {
-                            // System.Windows.MessageBox.Show("ERROR:" + ex.Message);
-
-                        }
                         //string[] args = new string[2];
                         //args[0] = hosCode;
                         //args[1] = scanBarCode;
@@ -677,16 +651,16 @@ namespace Seekya
                             if (String.Compare(dtrw["TABLE_NAME"].ToString(), "") != 0)
                             {
                                 listHasValue = true;
-                                strsql = "select mbodyget,mbodydata,mbodystate,tvalue from " + dtrw["TABLE_NAME"].ToString();
+                                strsql= "select mbody,tvalue from " + dtrw["TABLE_NAME"].ToString();
                                 OleDbCommand oleDbCommand = new OleDbCommand(strsql, ConnectionlistenZerohb);
                                 OleDbDataReader reader = oleDbCommand.ExecuteReader();
                                 reader.Read();
-                                string time = Regex.Split(reader.GetValue(1).ToString(), "红细胞寿命", RegexOptions.IgnoreCase)[1].Split('|')[3].ToString();
+                                string time = Regex.Split(reader.GetValue(0).ToString(), "红细胞寿命", RegexOptions.IgnoreCase)[1].Split('|')[3].ToString();
                                 string listentime = time.Substring(8, 2) + ":" + time.Substring(10, 2) + ":" + time.Substring(12, 2);
                                 string date = time.Substring(0, 8);
-                                int tmpvalue = Int32.Parse(reader.GetValue(3).ToString());
+                                int tmpvalue = Int32.Parse(reader.GetValue(1).ToString());
                                 string id = dtrw["TABLE_NAME"].ToString();
-                                string name_sign = Regex.Split(reader.GetValue(1).ToString(), "PID", RegexOptions.IgnoreCase)[1].Split('|')[5].ToString();
+                                string name_sign = Regex.Split(reader.GetValue(0).ToString(), "PID", RegexOptions.IgnoreCase)[1].Split('|')[5].ToString();
                                 string name = name_sign.Substring(0, name_sign.Length - 1);
                                 string sendtimeup = time.Substring(0, 4) + "-" + time.Substring(4, 2) + "-" + time.Substring(6, 2) + " " + time.Substring(8, 2) + ":" + time.Substring(10, 2) + ":" + time.Substring(12, 2);
 
@@ -696,21 +670,18 @@ namespace Seekya
                                                         <root>                                                         
                                                                    <serverName>" + "GetLisReports" + "</serverName><format>" + "XML" + "</format><callOperator>" + "" + "</callOperator><certificate>" + "NF6LprJJMrqt6ePCODNhQQ==" + "</certificate><orgCode>" + 01 + "</orgCode>  </root>";
                                 string msgBody = string.Empty;
-                                //msgBody = @"<?xml version='1.0' encoding='utf-8'?>                                                   
-                                //                        <root>                                                         
-                                //                                   <IcCardId>" + id + "</IcCardId></root>";
                                 msgBody = @"<?xml version='1.0' encoding='utf-8'?>                                                   
                                                         <root>                                                         
-                                                                   <PatientId>" + id + "</PatientId></root>";
-                                //msgBody = @"<?xml version='1.0' encoding='utf-8'?>
-                                //                      <root><" + reader.GetValue(0) + ">" + id + "</" + reader.GetValue(0) + "></root>";
+                                                                   <IcCardId>" + id + "</IcCardId> </root>";
                                 args[0] = msgHeader;
                                 args[1] = msgBody;
-                                rst = WebServiceHelper.InvokeWebService(url, "CallInterface", args);
+                                WebReference.WSInterface WSI02 = new WebReference.WSInterface();
+                                rst = WSI02.CallInterface(msgHeader, msgBody);
+                                //rst = WebServiceHelper.InvokeWebService(url, "CallInterface", args);
                                 XmlDocument doc = new XmlDocument();
                                 doc.LoadXml(rst.ToString());
                                 result = doc.SelectSingleNode("/root/returnContents/returnContent/ItemResult").InnerText;
-                                if (result.ToString() != "" && result.ToString() != "0" && result.ToString() != "null")
+                                if (result.ToString() != "" && result.ToString() != "0"&&result.ToString()!="null"&&result.ToString().Trim()!="未做")
                                 {
                                     string RBC = (tmpvalue * Convert.ToInt32(result) / 100).ToString();
 
@@ -819,7 +790,7 @@ namespace Seekya
                                     {
                                         System.Windows.MessageBox.Show("ERROR34:" + e34.Message);
                                     }
-                                    string TempletFileName = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\template\\" + name + "(" + time + ").xlsx";
+                                    string TempletFileName = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\template\\" + name+ "(" + time + ").xlsx";
                                     FileStream file = new FileStream(TempletFileName, FileMode.Open, FileAccess.Read);
                                     IWorkbook hssfworkbook = new XSSFWorkbook(file);
                                     ISheet ws = hssfworkbook.GetSheet("Sheet1");
@@ -830,7 +801,7 @@ namespace Seekya
                                     cell = row.GetCell(19);
                                     cell.SetCellValue(RBC);
 
-                                    if (hxbsm.Count > 1)
+                                    if (hxbsm.Count > 1&&hxbsm.Count<10)
                                     {
                                         for (int w = 0; w < hxbsm.Count; w++)
                                         {
@@ -867,29 +838,25 @@ namespace Seekya
                                     string[] argup = new string[2];
                                     string guid = Guid.NewGuid().ToString("N");
                                     string msgheaderup = string.Empty;
-                                    msgheaderup = @"<?xml version='1.0' encoding='utf-8'?>                                                   
+                                    msgheaderup= @"<?xml version='1.0' encoding='utf-8'?>                                                   
                                                         <root>                                                         
                                                         <serverName>" + "SendNmrReport" + "</serverName><format>" + "HL7v2" + "</format><callOperator>" + "" + "</callOperator><certificate>" + "NF6LprJJMrqt6ePCODNhQQ==" + "</certificate><msgNo>" + guid + "</msgNo><sendTime>" + sendtimeup + "</sendTime><sendCount>" + 0 + "</sendCount>  </root>";
                                     string msgbodyup = string.Empty;
                                     //string rank = GetRankNum(name);
-                                    msgbodyup = Regex.Split(reader.GetValue(1).ToString(), "null", RegexOptions.IgnoreCase)[0].ToString() + RBC + Regex.Split(reader.GetValue(1).ToString(), "null", RegexOptions.IgnoreCase)[1].ToString();
+                                    msgbodyup = Regex.Split(reader.GetValue(0).ToString(), "红细胞寿命", RegexOptions.IgnoreCase)[0].ToString() + "红细胞寿命||" + RBC + "|天" + Regex.Split(reader.GetValue(0).ToString(), "天", RegexOptions.IgnoreCase)[1].ToString();
                                     argup[0] = msgheaderup;
                                     argup[1] = msgbodyup;
-                                    //url = "http://168.2.5.26:1906/services/WSInterface?wsdl";  //FJ
-                                    url = "http://192.168.31.164/Webservice1.asmx?wsdl";
-                                    //object resentup = WebServiceHelper.InvokeWebService(url, "CallInterface", argup);  //FJ
-                                    object resentup = WebServiceHelper.InvokeWebService(url, "UPLOAD", argup);
+                                    url = "http://168.2.5.26:1906/services/WSInterface?wsdl";
+                                    WebReference1.WSInterface WSI03 = new WebReference1.WSInterface();
+                                    object resentup = WSI03.CallInterface(msgheaderup, msgbodyup);
+                                    //object resentup = WebServiceHelper.InvokeWebService(url, "CallInterface", argup);
+                                    //object resentup = WebServiceHelper.InvokeWebService(url, "UPLOAD", argup);
 
-                                    msgheaderup= @"<?xml version='1.0' encoding='utf-8'?>                                                   
-                                                        <root>                                                         
-                                                        <serverName>" + "ChangeNmrApplyStatus" + "</serverName><format>" + "HL7v2" + "</format><callOperator>" + "" + "</callOperator><certificate>" + "NF6LprJJMrqt6ePCODNhQQ==" + "</certificate><msgNo>" + guid + "</msgNo><sendTime>" + sendtimeup + "</sendTime><sendCount>" + 0 + "</sendCount>  </root>";
-                                    //msgbodyup = Regex.Split(reader.GetValue(2).ToString(), "||R", RegexOptions.IgnoreCase)[0].ToString() + "||C\n";
-                                    msgbodyup = reader.GetValue(2).ToString().Replace("||R", "||C");
-                                    argup[0] = msgheaderup;
-                                    argup[1] = msgbodyup;
-                                    url = "http://192.168.31.164/Webservice1.asmx?wsdl";
-                                    object resultud = WebServiceHelper.InvokeWebService(url, "UDST", argup);
-
+                                    //this.receiveInfo.Dispatcher.Invoke(new Action(() =>
+                                    //{
+                                    //    receiveInfo.Text += "modify result success !"+System.Environment.NewLine;
+                                    //    this.receiveInfo.ScrollToEnd();
+                                    //}));
 
                                     ConnectionlistenZerohb.Close();
                                     OleDbConnection connectiondel = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + System.AppDomain.CurrentDomain.BaseDirectory + "Data\\ZerohbRecord.mdb");
@@ -903,6 +870,12 @@ namespace Seekya
                                     try
                                     {
                                         SendPdfReport(date, pdffilename);
+
+                                        //this.receiveInfo.Dispatcher.Invoke(new Action(() =>
+                                        //{
+                                        //    receiveInfo.Text += "modify file success !" + System.Environment.NewLine;
+                                        //    this.receiveInfo.ScrollToEnd();
+                                        //}));
                                     }
                                     catch (Exception e36)
                                     {
@@ -913,7 +886,8 @@ namespace Seekya
 
                         }
                         ConnectionlistenZerohb.Close();
-                        #region list version
+
+                        #region
                         //if (String.Compare(dtrw["TABLE_NAME"].ToString(), "1") != 0)
 
                         //for (int i = 0; i < idlist.Length; i++)
@@ -928,7 +902,7 @@ namespace Seekya
                         //            string msgHeader = string.Empty;
                         //            msgHeader = @"<?xml version='1.0' encoding='utf-8'?>                                                   
                         //                                <root>                                                         
-                        //                                           <serverName>" + "getListReport" + "</serverName><format>" + "XML" + "</format><callOperator>" + "" + "</callOperator><certificate>" + "NF6LprJJMrqt6ePCODNhQQ==" + "</certificate><orgCode>" + 01 + "</orgCode>  </root>";
+                        //                                           <serverName>" + "GetLisReports" + "</serverName><format>" + "XML" + "</format><callOperator>" + "" + "</callOperator><certificate>" + "NF6LprJJMrqt6ePCODNhQQ==" + "</certificate><orgCode>" + 01 + "</orgCode>  </root>";
                         //            string msgBody = string.Empty;
                         //            msgBody = @"<?xml version='1.0' encoding='utf-8'?>                                                   
                         //                                <root>                                                         
@@ -1206,6 +1180,7 @@ namespace Seekya
                         //    }
                         //}
                         #endregion
+
                         if (!listHasValue)
                         {
                             websign = false;
@@ -3044,325 +3019,40 @@ namespace Seekya
             {
                 return;
             }
-            //string /*scanBarCode = null, */hosCode = null, url = null;
-            //string pathStringCom = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\scan.txt";
+            string /*scanBarCode = null, */hosCode = null, url = null;
+            string pathStringCom = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\scan.txt";
+
             scanBarCode = tBoxScanBar.Text;
-            //scanBarCode = "20181112";
-            //if (tBoxScanBar.Text.Trim()=="6971448480041")
-            //{
-            //    receiveInfo.Text += "true";
-            //}
-            //else
-            //{
-            //    receiveInfo.Text += "false";
-            //}
-            //try
-            //{
-            //    //FileStream fs1 = new FileStream(pathString, FileMode.Open, FileAccess.ReadWrite);
-            //    StreamReader sr = new StreamReader(pathStringCom, Encoding.GetEncoding("gb2312"));
 
-            //    sr.ReadLine();
+            try
+            {
+                //FileStream fs1 = new FileStream(pathString, FileMode.Open, FileAccess.ReadWrite);
+                StreamReader sr = new StreamReader(pathStringCom, Encoding.GetEncoding("gb2312"));
 
-            //    //读入医院代码以及url
-            //    hosCode = sr.ReadLine();
-            //    url = sr.ReadLine();
+                sr.ReadLine();
 
-            //    sr.Close();
-            //    //fs1.Close();
+                //读入医院代码以及url
+                hosCode = sr.ReadLine();
+                url = sr.ReadLine();
 
-            //}
-            //catch (Exception ex)
-            //{
-            //    // System.Windows.MessageBox.Show("ERROR:" + ex.Message);
+                sr.Close();
+                //fs1.Close();
 
-            //}
+            }
+            catch (Exception ex)
+            {
+                // System.Windows.MessageBox.Show("ERROR:" + ex.Message);
 
-            //old buttonclick
-            #region
-            //#region
-            ////！！！！fz hospital！！！！
-            //string XmlFile = string.Empty;
-            //XmlFile += "        </DHCLISTOHXBSM></HXBSMCDYJCJG>";
-            //string[] args = new string[2];
-            //string msgHeader = string.Empty;
-            //msgHeader = @"<?xml version='1.0' encoding='utf-8'?>                                                   
-            //                                            <root>                                                         
-            //                                                       <serverName>" + "GetLisReports" + "</serverName><format>" + "XML" + "</format><callOperator>" + "" + "</callOperator><certificate>" + "NF6LprJJMrqt6ePCODNhQQ==" + "</certificate><orgCode>" + 01 + "</orgCode>  </root>";
-            //string msgBody = string.Empty;
-            //msgBody = @"<?xml version='1.0' encoding='utf-8'?>                                                   
-            //                                            <root>                                                         
-            //                                                       <IcCardId>" + scanBarCode + "</IcCardId> </root>";
-            //args[0] = msgHeader;
-            //args[1] = msgBody;
-            ////url = "http://168.2.5.28:1506/services/WSInterface?wsdl";  //FJ
-            //url = "http://192.168.31.164/Webservice1.asmx?wsdl";
-            //try
-            //{
-            //    object result = WebServiceHelper.InvokeWebService(url, "CallInterface", args);
-            //    //System.Windows.MessageBox.Show(result.ToString());
-            //    //解析信息
-            //    XmlDocument doc = new XmlDocument();
-            //    doc.LoadXml(result.ToString());
-            //    XmlElement root = null;
-            //    root = doc.DocumentElement;
-            //    XmlNodeList listNodes = null;
-            //    //登记号
-            //    listNodes = root.SelectNodes("/root/returnContents/returnContent/PatientId");
-            //    foreach (XmlNode node in listNodes)
-            //    {
-            //        id.Text = node.InnerText;
-            //    }
+            }
 
-            //    //姓名
-            //    listNodes = root.SelectNodes("/root/returnContents/returnContent/PatientName");
-            //    foreach (XmlNode node in listNodes)
-            //    {
-            //        name.Text = node.InnerText;
-            //        PatientName = name.Text;
-            //    }
-
-            //    //性别
-            //    listNodes = root.SelectNodes("/root/returnContents/returnContent/Sex");
-            //    foreach (XmlNode node in listNodes)
-            //    {
-            //        sex.Text = node.InnerText;
-            //    }
-
-            //    //年龄
-            //    listNodes = root.SelectNodes("/root/returnContents/returnContent/Age");
-            //    foreach (XmlNode node in listNodes)
-            //    {
-            //        age.Text = node.InnerText;
-            //    }
-
-            //    //报告医生
-            //    listNodes = root.SelectNodes("/root/returnContents/returnContent/ReportOperator");
-
-            //    foreach (XmlNode node in listNodes)
-            //    {
-            //        checkDoctor.Text = node.InnerText;
-            //        ReportOperator = checkDoctor.Text;
-            //    }
-
-            //    ////复核医生
-            //    //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/fhdoctor");
-
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    reviewDoctor.Text = node.InnerText;
-            //    //}
-
-            //    ////送检医生
-            //    //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/sjdoctor");
-
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    sendDoctor.Text = node.InnerText;
-            //    //}
-
-            //    //血红蛋白浓度
-            //    //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/res/DHCLISTOHXBSMRES/result");
-            //    listNodes = root.SelectNodes("/root/returnContents/returnContent/ItemResult");
-
-            //    foreach (XmlNode node in listNodes)
-            //    {
-            //        //rbConcentration.Text = node.InnerText;
-            //        textboxhb.Text = node.InnerText;
-            //    }
-
-            //    ////报告编号
-            //    //listNodes = root.SelectNodes("/root/returnContents/returnContent/HisNo");
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    HisNo = node.InnerText;
-            //    //}
-
-            //    ////病人住院号
-            //    //listNodes = root.SelectNodes("/root/returnContents/returnContent/VisitNo");
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    VisitNo = node.InnerText;
-            //    //}
-
-            //    ////病人id
-            //    //listNodes = root.SelectNodes("/root/returnContents/returnContent/PatientId");
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    PatientId = node.InnerText;
-            //    //}
-
-            //    ////病人类型
-            //    //listNodes = root.SelectNodes("/root/returnContents/returnContent/VisitType");
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    VisitType = node.InnerText;
-            //    //}
-
-
-            //    ////初诊
-            //    //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/cz");
-
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    firstCheck.Text = node.InnerText;
-            //    //}
-            //    #endregion
-
-            //    #region
-            //    //////！！！！orign！！！！
-            //    ////向后台发送条形码
-            //    //string[] args = new string[2];
-            //    //args[0] = hosCode;
-            //    //args[1] = scanBarCode;
-            //    //object result = WebServiceHelper.InvokeWebService(url, "DHCGetXXByLabno", args);
-
-            //    ////解析获取到的患者信息
-            //    //XmlDocument doc = new XmlDocument();
-
-            //    //doc.LoadXml(result.ToString());
-
-            //    //XmlElement root = null;
-            //    //root = doc.DocumentElement;
-            //    //XmlNodeList listNodes = null;
-
-            //    ////住院号
-            //    //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/zyh");
-
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    id.Text = node.InnerText;
-            //    //}
-
-            //    ////姓名
-            //    //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/patname");
-
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    name.Text = node.InnerText;
-            //    //}
-
-            //    ////性别
-            //    //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/Sex");
-
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    sex.Text = node.InnerText;
-            //    //}
-
-            //    //if (String.Compare(sex.Text, "M") == 0)
-            //    //    sex.Text = "男";
-            //    //else
-            //    //    sex.Text = "女";
-
-            //    ////年龄
-            //    //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/age");
-
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    age.Text = node.InnerText;
-            //    //}
-
-            //    ////报告医生
-            //    //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/bgdoctor");
-
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    checkDoctor.Text = node.InnerText;
-            //    //}
-
-            //    ////复核医生
-            //    //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/fhdoctor");
-
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    reviewDoctor.Text = node.InnerText;
-            //    //}
-
-            //    ////送检医生
-            //    //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/sjdoctor");
-
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    sendDoctor.Text = node.InnerText;
-            //    //}
-
-            //    ////血红蛋白浓度
-            //    ////listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/res/DHCLISTOHXBSMRES/result");
-            //    //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/result");
-
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    //rbConcentration.Text = node.InnerText;
-            //    //    textboxhb.Text = node.InnerText;
-            //    //}
-
-            //    ////初诊
-            //    //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/cz");
-
-            //    //foreach (XmlNode node in listNodes)
-            //    //{
-            //    //    firstCheck.Text = node.InnerText;
-            //    //}
-            //    ////string pathString = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\patientInfo.txt";
-            //    ////FileStream fs1 = new FileStream(pathString, FileMode.Open, FileAccess.Read);
-            //    ////StreamReader sr1 = new StreamReader(fs1);
-            //    ////for (int i = 0; i < 12; i++)
-            //    ////{
-            //    ////    string nd = sr1.ReadLine();
-            //    ////    propts[i] = nd;
-            //    ////    if (string.Compare(nd, "NULL") != 0)
-            //    ////    {
-            //    ////        listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/" + nd);
-            //    ////        foreach (XmlNode node in listNodes)
-            //    ////        {
-            //    ////            values[i] = node.InnerText;
-            //    ////        }
-            //    ////    }
-            //    ////}
-            //    #endregion
-
-            //    if (Patient_type.Text.Trim() == "住院")
-            //    {
-            //        VisitType = "I";
-            //    }
-            //    else if (Patient_type.Text.Trim() == "门诊")
-            //    {
-            //        VisitType = "O";
-            //    }
-            //    else
-            //    {
-            //        VisitType = "T";
-            //    }
-
-            //    //websign = true;
-            //    wsn = true;
-
-            //    //num++;
-            //    //if (num >= 20)
-            //    //{
-            //    //    num = 0; //一条记录最多保存20次检索，20次之后排除在检索之外(无重置num的情况)
-            //    //}
-            //    //idlist[num] = scanBarCode;
-            //    //tmpRBClist[num] = 0;
-            //    //timelist[num] = "";
-
-            //    System.Windows.MessageBox.Show("数据传入成功");
-            //}
-            //catch (Exception ew)
-            //{
-            //    System.Windows.MessageBox.Show("ERROR:请验证患者ID是否正确!");
-            //}
-            #endregion
-
-
+            //！！！！fz hospital！！！！
             string XmlFile = string.Empty;
             XmlFile += "        </DHCLISTOHXBSM></HXBSMCDYJCJG>";
             string[] args = new string[2];
             string msgHeader = string.Empty;
-            scanBarCode = tBoxScanBar.Text;
             msgHeader = @"<?xml version='1.0' encoding='utf-8'?>                                                   
                                                         <root>                                                         
-                                                                   <serverName>" + "GetLisReports" + "</serverName><format>" + "XML" + "</format><callOperator>" + "" + "</callOperator><certificate>" + "NF6LprJJMrqt6ePCODNhQQ==" + "</certificate><orgCode>" + 01 + "</orgCode> </root>";
+                                                                   <serverName>" + "GetLisReports" + "</serverName><format>" + "XML" + "</format><callOperator>" + "" + "</callOperator><certificate>" + "NF6LprJJMrqt6ePCODNhQQ==" + "</certificate><orgCode>" + 01 + "</orgCode>  </root>";
             string msgBody = string.Empty;
             if (Patient_type.Text.Trim() == "住院")
             {
@@ -3370,7 +3060,6 @@ namespace Seekya
                 msgBody = @"<?xml version='1.0' encoding='utf-8'?>                                                   
                                                         <root>                                                         
                                                                    <VisitNo>" + scanBarCode + "</VisitNo> </root>";
-                zeroRecords[0] = "VisitNo";
             }
             else if (Patient_type.Text.Trim() == "门诊")
             {
@@ -3378,8 +3067,6 @@ namespace Seekya
                 msgBody = @"<?xml version='1.0' encoding='utf-8'?>                                                   
                                                         <root>                                                         
                                                                    <IcCardId>" + scanBarCode + "</IcCardId> </root>";
-                zeroRecords[0] = "IcCardId";
-
             }
             else
             {
@@ -3387,114 +3074,258 @@ namespace Seekya
                 msgBody = @"<?xml version='1.0' encoding='utf-8'?>                                                   
                                                         <root>                                                         
                                                                    <IcCardId>" + scanBarCode + "</IcCardId> </root>";
-                zeroRecords[0] = "IcCardId";
-
             }
-            //msgBody = @"<?xml version='1.0' encoding='utf-8'?>                                                   
-            //                                            <root>                                                         
-            //                                                       <IcCardId>" + scanBarCode + "</IcCardId> </root>";
-            //zeroRecords[0] = msgBody;
             args[0] = msgHeader;
             args[1] = msgBody;
-            //string url = "http://168.2.5.28:1506/services/WSInterface?wsdl";  //FJ
-            string url = "http://192.168.31.164/Webservice1.asmx?wsdl";
-            try
+            //url = "http://168.2.5.28:1506/services/WSInterface?wsdl";
+            url = "http://168.2.5.28:1506/services/WSInterface?wsdl";
+
+            //静态
+            WebReference.WSInterface WSI01 = new WebReference.WSInterface();
+            object result = WSI01.CallInterface(msgHeader, msgBody);
+            //object result = WebServiceHelper.InvokeWebService(url, "CallInterface", args);
+            //System.Windows.MessageBox.Show(result.ToString());
+            //解析信息
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(result.ToString());
+            XmlElement root = null;
+            root = doc.DocumentElement;
+            XmlNodeList listNodes = null;
+            //登记号
+            listNodes = root.SelectNodes("/root/returnContents/returnContent/VisitNo");
+            foreach (XmlNode node in listNodes)
             {
-                object result = WebServiceHelper.InvokeWebService(url, "GetExamApplyByHXB", args);
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(result.ToString());
-                XmlElement root = null;
-                root = doc.DocumentElement;
-                XmlNodeList listNodes = null;
-                listNodes = root.SelectNodes("/root/contents/content");
-                int formsNumber = listNodes.Count;
-                ApplyForms = System.DateTime.Now.ToString("yyMMddhhmmss");
-                OleDbConnection dbapfm = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + System.AppDomain.CurrentDomain.BaseDirectory + "Data/applyforms.mdb");
-                string sqlforms = "CREATE TABLE " + ApplyForms + " (申请单号 ntext,病人ID ntext,住院号 ntext,项目代码 ntext,项目名称 ntext,申请时间 ntext)";
-                dbapfm.Open();
-                OleDbCommand cmdforms = null;
-                cmdforms = new OleDbCommand(sqlforms, dbapfm);
-                cmdforms.ExecuteNonQuery();
-                dbapfm.Close();
-                for (int i = 0; i < formsNumber; i++)
+                id.Text = node.InnerText;
+            }
+
+            //姓名
+            listNodes = root.SelectNodes("/root/returnContents/returnContent/PatientName");
+            foreach (XmlNode node in listNodes)
+            {
+                name.Text = node.InnerText;
+                PatientName = name.Text;
+            }
+
+            //性别
+            listNodes = root.SelectNodes("/root/returnContents/returnContent/Sex");
+            foreach (XmlNode node in listNodes)
+            {
+                sex.Text = node.InnerText;
+            }
+
+            //年龄
+            listNodes = root.SelectNodes("/root/returnContents/returnContent/Age");
+            foreach (XmlNode node in listNodes)
+            {
+                age.Text = node.InnerText;
+            }
+
+            //报告医生
+            listNodes = root.SelectNodes("/root/returnContents/returnContent/ReportOperator");
+
+            foreach (XmlNode node in listNodes)
+            {
+                checkDoctor.Text = node.InnerText;
+                ReportOperator = checkDoctor.Text;
+            }
+
+            ////复核医生
+            //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/fhdoctor");
+
+            //foreach (XmlNode node in listNodes)
+            //{
+            //    reviewDoctor.Text = node.InnerText;
+            //}
+
+            ////送检医生
+            //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/sjdoctor");
+
+            //foreach (XmlNode node in listNodes)
+            //{
+            //    sendDoctor.Text = node.InnerText;
+            //}
+
+            //血红蛋白浓度
+            //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/res/DHCLISTOHXBSMRES/result");
+            listNodes = root.SelectNodes("/root/returnContents/returnContent/ItemResult");
+
+            foreach (XmlNode node in listNodes)
+            {
+                //rbConcentration.Text = node.InnerText;
+                //textboxhb.Text = node.InnerText;
+                string HBreturn = node.InnerText;
+                if (HBreturn.Trim()=="未做")
                 {
-                    dbapfm.Open();
-                    sqlforms = "Insert into " + ApplyForms + " (申请单号,病人ID,住院号,项目代码,项目名称,申请时间) values ('" + root.SelectNodes("/root/contents/content/APPLY_NO")[i].InnerText + "','" + root.SelectNodes("/root/contents/content/SICK_ID")[i].InnerText + "','" + root.SelectNodes("/root/contents/content/NULLAH_NUMBER")[i].InnerText + "','" + root.SelectNodes("/root/contents/content/ITEM_CODE")[i].InnerText + "','" + root.SelectNodes("/root/contents/content/ITEM_NAME")[i].InnerText + "','" + root.SelectNodes("/root/contents/content/APPLY_TIME")[i].InnerText + "')";
-                    cmdforms = new OleDbCommand(sqlforms, dbapfm);
-                    cmdforms.ExecuteNonQuery();
-                    dbapfm.Close();
+                    textboxhb.Text ="0";
                 }
-                //注释代码
-                #region
-                //string[] applynos = new string[formsNumber];
-                //string[] sickids = new string[formsNumber];
-                //string[] nullahnumbers = new string[formsNumber];
-                //string[] itemcodes = new string[formsNumber];
-                //string[] itemnames = new string[formsNumber];
-                //string[] applytimes = new string[formsNumber];
-                //listNodes = root.SelectNodes("/root/contents/content/APPLY_NO");
-                //for (int i = 0; i < formsNumber; i++)
-                //{
-                //    applynos[i] = listNodes[i].InnerText;
-                //}
-                //listNodes = root.SelectNodes("/root/contents/content/SICK_ID");
-                //for (int i = 0; i < formsNumber; i++)
-                //{
-                //    sickids[i] = listNodes[i].InnerText;
-                //}
-                //listNodes = root.SelectNodes("/root/contents/content/NULLAH_NUMBER");
-                //for (int i = 0; i < formsNumber; i++)
-                //{
-                //    nullahnumbers[i] = listNodes[i].InnerText;
-                //}
-                //listNodes = root.SelectNodes("/root/contents/content/ITEM_CODE");
-                //for (int i = 0; i < formsNumber; i++)
-                //{
-                //    itemcodes[i] = listNodes[i].InnerText;
-                //}
-                //listNodes = root.SelectNodes("/root/contents/content/ITEM_NAME");
-                //for (int i = 0; i < formsNumber; i++)
-                //{
-                //    itemnames[i] = listNodes[i].InnerText;
-                //}
-                //listNodes = root.SelectNodes("/root/contents/content/APPLY_TIME");
-                //for (int i = 0; i < formsNumber; i++)
-                //{
-                //    applytimes[i] = listNodes[i].InnerText;
-                //}
-
-                //if (Patient_type.Text.Trim() == "住院")
-                //{
-                //    VisitType = "I";
-                //}
-                //else if (Patient_type.Text.Trim() == "门诊")
-                //{
-                //    VisitType = "O";
-                //}
-                //else
-                //{
-                //    VisitType = "T";
-                //}
-
-                //websign = true;
-                wsn = true;
-                #endregion
-
-                if (result != null)
+                else
                 {
-                    if (apfmOpen == false)
-                    {
-                        Thread apfmdt = new Thread(new ThreadStart(apfmdtShowdiaglog));
-                        apfmdt.SetApartmentState(ApartmentState.STA);
-                        apfmdt.IsBackground = true;
-                        apfmdt.Start();
-                    }
+                    textboxhb.Text = HBreturn;
                 }
             }
-            catch (Exception e202012071826)
+
+            //报告编号
+            listNodes = root.SelectNodes("/root/returnContents/returnContent/HisNo");
+            foreach (XmlNode node in listNodes)
             {
-                System.Windows.MessageBox.Show("ERROR202012071826:" + e202012071826.Message);
+                HisNo = node.InnerText;
             }
+
+            //病人住院号
+            listNodes = root.SelectNodes("/root/returnContents/returnContent/VisitNo");
+            foreach (XmlNode node in listNodes)
+            {
+                VisitNo = node.InnerText;
+            }
+
+            //病人id
+            listNodes = root.SelectNodes("/root/returnContents/returnContent/PatientId");
+            foreach (XmlNode node in listNodes)
+            {
+                PatientId = node.InnerText;
+            }
+
+            //病人类型
+            listNodes = root.SelectNodes("/root/returnContents/returnContent/VisitType");
+            foreach (XmlNode node in listNodes)
+            {
+                VisitType = node.InnerText;
+            }
+
+
+            ////初诊
+            //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/cz");
+
+            //foreach (XmlNode node in listNodes)
+            //{
+            //    firstCheck.Text = node.InnerText;
+            //}
+
+            //////！！！！orign！！！！
+            ////向后台发送条形码
+            //string[] args = new string[2];
+            //args[0] = hosCode;
+            //args[1] = scanBarCode;
+            //object result = WebServiceHelper.InvokeWebService(url, "DHCGetXXByLabno", args);
+
+            ////解析获取到的患者信息
+            //XmlDocument doc = new XmlDocument();
+
+            //doc.LoadXml(result.ToString());
+
+            //XmlElement root = null;
+            //root = doc.DocumentElement;
+            //XmlNodeList listNodes = null;
+
+            ////住院号
+            //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/zyh");
+
+            //foreach (XmlNode node in listNodes)
+            //{
+            //    id.Text = node.InnerText;
+            //}
+
+            ////姓名
+            //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/patname");
+
+            //foreach (XmlNode node in listNodes)
+            //{
+            //    name.Text = node.InnerText;
+            //}
+
+            ////性别
+            //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/Sex");
+
+            //foreach (XmlNode node in listNodes)
+            //{
+            //    sex.Text = node.InnerText;
+            //}
+
+            //if (String.Compare(sex.Text, "M") == 0)
+            //    sex.Text = "男";
+            //else
+            //    sex.Text = "女";
+
+            ////年龄
+            //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/age");
+
+            //foreach (XmlNode node in listNodes)
+            //{
+            //    age.Text = node.InnerText;
+            //}
+
+            ////报告医生
+            //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/bgdoctor");
+
+            //foreach (XmlNode node in listNodes)
+            //{
+            //    checkDoctor.Text = node.InnerText;
+            //}
+
+            ////复核医生
+            //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/fhdoctor");
+
+            //foreach (XmlNode node in listNodes)
+            //{
+            //    reviewDoctor.Text = node.InnerText;
+            //}
+
+            ////送检医生
+            //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/sjdoctor");
+
+            //foreach (XmlNode node in listNodes)
+            //{
+            //    sendDoctor.Text = node.InnerText;
+            //}
+
+            ////血红蛋白浓度
+            ////listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/res/DHCLISTOHXBSMRES/result");
+            //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/result");
+
+            //foreach (XmlNode node in listNodes)
+            //{
+            //    //rbConcentration.Text = node.InnerText;
+            //    textboxhb.Text = node.InnerText;
+            //}
+
+            ////初诊
+            //listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/cz");
+
+            //foreach (XmlNode node in listNodes)
+            //{
+            //    firstCheck.Text = node.InnerText;
+            //}
+            ////string pathString = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\patientInfo.txt";
+            ////FileStream fs1 = new FileStream(pathString, FileMode.Open, FileAccess.Read);
+            ////StreamReader sr1 = new StreamReader(fs1);
+            ////for (int i = 0; i < 12; i++)
+            ////{
+            ////    string nd = sr1.ReadLine();
+            ////    propts[i] = nd;
+            ////    if (string.Compare(nd, "NULL") != 0)
+            ////    {
+            ////        listNodes = root.SelectNodes("/DHCLISTOHXBSMLIST/DHCLISTOHXBSM/" + nd);
+            ////        foreach (XmlNode node in listNodes)
+            ////        {
+            ////            values[i] = node.InnerText;
+            ////        }
+            ////    }
+            ////}
+
+            
+
+            //websign = true;
+            wsn = true;
+            //num++;
+            //if (num >= 20)
+            //{
+            //    num = 0; //一条记录最多保存20次检索，20次之后排除在检索之外(无重置num的情况)
+            //}
+            //idlist[num] = scanBarCode;
+            //tmpRBClist[num] = 0;
+            //timelist[num] = "";
+
+            System.Windows.MessageBox.Show("数据传入成功");
 
         }
 
@@ -3545,14 +3376,9 @@ namespace Seekya
                 //System.Windows.MessageBox.Show("未能正常关闭软件！");
             }
 
-        }         
-
-        public void apfmdtShowdiaglog()
-        {
-            applyformsDetails = new ApplyFormsDetails(this);
-            applyformsDetails.Show();
-            apfmOpen = true;
-            System.Windows.Threading.Dispatcher.Run();
         }
+
+
+
     }
 }

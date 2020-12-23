@@ -710,7 +710,7 @@ namespace Seekya
                         cell.SetCellValue(co2Low);
                         #endregion
 
-                        if (hxbsm.Count > 1)
+                        if (hxbsm.Count > 1&&hxbsm.Count<10)
                         {
                             for (int w = 0; w < hxbsm.Count; w++)
                             {
@@ -729,12 +729,12 @@ namespace Seekya
 
 
                         //另存为以姓名+日期+时间+序号为文件名的文件 (3.23new)
-                        string datex = date.Substring(0, 4) + date.Substring(5, 2) + date.Substring(8, 2);
-                        string datetime2 = time.Substring(0, 2) + time.Substring(3, 2) + time.Substring(6, 2);
+                        string datex = date.Substring(0, 4) + date.Substring(5, 2) + date.Substring(8, 2);  //20200109
+                        string datetime2 = time.Substring(0, 2) + time.Substring(3, 2) + time.Substring(6, 2);  //120159
                         string excelname = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\Template\\" + nm + "(" + datex + datetime2 + ")" + ".xlsx";
                         int postn = excelname.LastIndexOf(".");
                         int kk = 1;
-                        while (System.IO.File.Exists(excelname))//excelname:E:\HelloWorld\【1】红细胞寿命测定仪上位机软件汇总-20181011更新\6.新版本源代码\红细胞寿命测定仪1.0版本-20190330\源代码 - 1.3.6（FJ) - 本地\Seekya\bin\Debug\Data\Template\詹姆斯(20201013175501).xlsx
+                        while (System.IO.File.Exists(excelname))
                         {
                             excelname = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\Template\\" + nm + "(" + datex + datetime2 + ")" + ".xlsx";
                             excelname = excelname.Insert(postn, "(" + kk + ")");
@@ -835,7 +835,6 @@ namespace Seekya
 
                         //判断是否调用后台接口
                         //if (scanBarOk.IsEnabled == true)
-                        //wsn = true;
                         if(wsn==true)
                         {
                             //string msgSendTime = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -850,26 +849,28 @@ namespace Seekya
                             Array.Reverse(x);
                             string picnum = new string(x) + mdhms.Substring(1, 3) + mdhms[0] + mdhms[9] + mdhms[8];
                             string guid = Guid.NewGuid().ToString("N");
-                            //string rank = GetRankNum(PatientName);
-                            string rank = "1";
+                            string rank = GetRankNum(PatientName);
+
                             FileInfo flinfo = new FileInfo(excelname);
                             string reportfile = flinfo.Name;
                             //string reportname = reportfile.Substring(0, reportfile.LastIndexOf("."));
-                            string reportname = reportfile.Split('(')[1].Split(')')[0];
-                            string x01 = "http://168.2.5.24:8088/NMRHXB/" + msgST.Substring(0, 8) + "/" + reportname +".pdf"+ System.Environment.NewLine;
+                            string reportname=reportfile.Split('(')[1].Split(')')[0];
+                            //receiveInfo.Text += "reportname:" + reportname + System.Environment.NewLine;
                             string msgHeader = string.Empty;
                             msgHeader = @"<?xml version='1.0' encoding='utf-8'?>                                                   
                                                         <root>                                                         
-                                                        <serverName>" + "SendNmrReport" + "</serverName><format>" + "HL7v2" + "</format><callOperator>" + "" + "</callOperator><certificate>" + "NF6LprJJMrqt6ePCODNhQQ==" + "</certificate><msgNo>"+guid+"</msgNo><sendTime>"+msgSendTime+"</sendTime><sendCount>" + 0 + "</sendCount></root>";
+                                                        <serverName>" + "SendNmrReport" + "</serverName><format>" + "HL7v2" + "</format><callOperator>" + "" + "</callOperator><certificate>" + "NF6LprJJMrqt6ePCODNhQQ==" + "</certificate><msgNo>"+guid+"</msgNo><sendTime>"+msgSendTime+"</sendTime><sendCount>" + 0 + "</sendCount>  </root>";
                             string msgBody = string.Empty;
                             msgBody = "MSH|^~\\&|P01||HIS||" + msgST + "||ORU^R01|" + guid + "|P|2.4||||||||||\n"
-                                + "PID|||" + ptID + "^" + ptnb + "^^^PI||" + PatientName + "^|\n"
-                                + "PV1||" + VisitType + "|||||||||||||||||" + ptnb + "||||||||||||||||||||||||||\n"
-                                + "OBR|" + rank + "|"+apfm+"||" + "125075" + "^" + "红细胞寿命测定-呼气法" + "||" + aptm + "|" + msgST + "|||||||||||||||" + msgST + "||||||||||" + ReportOperator + "|||核医学|||||||\n"
-                                + "NTE|" + rank + "||http://168.2.5.24:8088/NMRHXB/" + msgST.Substring(0, 8) + "/" + reportname + ".pdf|PDF\n"
+                                + "PID|||" + PatientId + "^" + VisitNo + "^^^PI||" + PatientName + "^|\n"
+                                + "PV1||" + VisitType + "|||||||||||||||||" + VisitNo + "||||||||||||||||||||||||||\n"
+                                + "OBR|" + rank + "|||" + "125075" + "^" + "红细胞寿命测定-呼气法" + "||" + msgST + "|" + msgST + "|||||||||||||||" + msgST + "||||||||||" + ReportOperator + "|||核医学|||||||\n"
+                                + "NTE|" + rank + "||http://168.2.5.24:8088/fls/NMRHXB/" + msgST.Substring(0, 8) + "/" + reportname + ".pdf|PDF\n"
                                 + "OBX|1|TX|红细胞寿命||" + dy + "|天|≥75||||F|||" + msgST + "||" + ReportOperator + "||\n"
                                 + "ZIM|1|1|" + guid + "|";
-                            zeroRecords[1] = msgBody;
+                            //receiveInfo.Text += "http://168.2.5.24:21/NMRHXB/" + msgST.Substring(0, 8) + "/" + reportname + ".pdf" + System.Environment.NewLine;
+                            //receiveInfo.Text += "HisNo:" + HisNo + System.Environment.NewLine;
+
                             //for (int ii = 0; ii < 12; ii++)
                             //{
                             //    if (values[ii] != null)
@@ -885,65 +886,62 @@ namespace Seekya
                             args[1] = msgBody;
                             string url = null;
 
-                            //string pathStringCom = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\scan.txt";
-                            //try
-                            //{
-                            //    //FileStream fs1 = new FileStream(pathString, FileMode.Open, FileAccess.ReadWrite);
-                            //    StreamReader sr = new StreamReader(pathStringCom, Encoding.GetEncoding("gb2312"));
-                            //    sr.ReadLine();
-                            //    sr.ReadLine();
-                            //    url = sr.ReadLine();
-                            //    sr.Close();
-                            //    //fs1.Close();
-                            //}
-                            //catch (Exception ex)
-                            //{
-                            //    // System.Windows.MessageBox.Show("ERROR:" + ex.Message);
-                            //}
+                            string pathStringCom = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\scan.txt";
 
                             try
                             {
-                                //url = "http://168.2.5.26:1906/services/WSInterface?wsdl";          //FJ
-                                url = "http://192.168.31.164/Webservice1.asmx?wsdl";
+                                //FileStream fs1 = new FileStream(pathString, FileMode.Open, FileAccess.ReadWrite);
+                                StreamReader sr = new StreamReader(pathStringCom, Encoding.GetEncoding("gb2312"));
 
+                                sr.ReadLine();
+                                sr.ReadLine();
+
+                                url = sr.ReadLine();
+
+                                sr.Close();
+                                //fs1.Close();
+
+                            }
+                            catch (Exception ex)
+                            {
+                                // System.Windows.MessageBox.Show("ERROR:" + ex.Message);
+
+                            }
+
+
+                            try
+                            {
+                                url = "http://168.2.5.26:1906/services/WSInterface?wsdl";
                                 //object result = WebServiceHelper.InvokeWebService(url, "DHCUpdateResult", args);
+                                WebReference1.WSInterface WSI04 = new WebReference1.WSInterface();
+                                object result = WSI04.CallInterface(msgHeader, msgBody);
                                 //object result = WebServiceHelper.InvokeWebService(url, "CallInterface", args);
-                                object result = WebServiceHelper.InvokeWebService(url, "UPLOAD", args);
+                                //object result = WebServiceHelper.InvokeWebService(url, "UPLOAD", args);
 
                                 //receiveInfo.Text += args[0].ToString() + System.Environment.NewLine;
                                 //receiveInfo.Text += args[1].ToString() + System.Environment.NewLine;
+
+                                if (String.Compare(result.ToString(), "0") == 0)
+                                {
+                                    //接收成功
+
+                                }
+                                else
+                                {
+
+
+                                }
                             }
-                            catch (Exception e202012091722)
+                            catch (Exception ex)
                             {
-                                System.Windows.MessageBox.Show("ERROR202012091722:"+e202012091722.Message);
-                            }
-                            try
-                            {
-                                string guidnew = Guid.NewGuid().ToString("N");
-                                msgHeader = @"<?xml version='1.0' encoding='utf-8'?>                                                   
-                                                        <root>                                                         
-                                                        <serverName>" + "ChangeNmrApplyStatus" + "</serverName><format>" + "HL7v2" + "</format><callOperator>" + "" + "</callOperator><certificate>" + "NF6LprJJMrqt6ePCODNhQQ==" + "</certificate><msgNo>" + guid + "</msgNo><sendTime>" + msgSendTime + "</sendTime><sendCount>" + 0 + "</sendCount> </root>";
-                                msgBody = "MSH|^~\\&|P01||HIS||" + msgST + "||ORM^001|" + guidnew + "|P|2.4\n"
-                                    + "PID|||" + ptID + "^" + ptnb + "^^^PI||" + PatientName + "^|\n"
-                                    + "PVI||" + VisitType + "||||||||||||||||" + ptnb + "\n"
-                                    + "ORC|SC|" + apfm + "|||" + "A" + "||||||||\n"
-                                    + "OBR|" + rank + "|" + apfm + "|"+guid+"|" + "125075" + "^" + "红细胞寿命测定-呼气法" + "|||||||||||||||||||||" + "R\n";
-                                zeroRecords[2] = msgBody;
-                                args[0] = msgHeader;
-                                args[1] = msgBody;
-                                url = "http://192.168.31.164/Webservice1.asmx?wsdl";
-                                object result = WebServiceHelper.InvokeWebService(url, "MODSTATE", args);
-                            }
-                            catch (Exception e202012091721)
-                            {
-                                MessageBox.Show("ERROR202012091721:" + e202012091721.Message);
+                                // System.Windows.MessageBox.Show("ERROR:" + ex.Message);
+
                             }
 
                             //若血红蛋白为0，则将本此记录存入数据库中
                             if (rb == "" || rb == "0")
                             {
-                                ZerohbRecordStored(scanBarCode, zeroRecords, tmpRBC);
-                                //ZerohbRecordStored(scanBarCode, args[1], tmpRBC);
+                                ZerohbRecordStored(scanBarCode, args[1],tmpRBC);
                                 websign = true;
                             }
                             else
@@ -952,7 +950,7 @@ namespace Seekya
                                 {
                                     //string pdfpathfilename = System.AppDomain.CurrentDomain.BaseDirectory + pdffilename;
                                     SendPdfReport(datex, pdffilename);
-                                    receiveInfo.Text += "uload file success !" + System.Environment.NewLine;
+                                    receiveInfo.Text += " upload file success ! " + System.Environment.NewLine;
                                 }
                                 catch (Exception e45)
                                 {
@@ -1142,82 +1140,81 @@ namespace Seekya
         {
             //string rootpath = @"ftp://" + "168.2.5.24:21/fls/";
             //string middenpath = @"ftp://" + "168.2.5.24:21/fls/NMRHXB/";
-            string rootpath = @"ftp://" + "172.26.38.193:21/NMRHXB/";
-            string path = @"ftp://" + "172.26.38.193:21/" + "NMRHXB/" + date + "/";
+            string rootpath= @"ftp://" + "168.2.5.24:21/NMRHXB/";
+            string path = @"ftp://" + "168.2.5.24:21/" + "NMRHXB/" + date + "/";
             //string path = @"ftp://" + "172.29.0.7:21/" + "NMRHXB/" + date + "/";
             if (MakeDir(rootpath))
             {
                 //if (MakeDir(middenpath))
                 //{
-                bool TF = MakeDir(path);
-                if (TF)
-                {
-                    //string username = "administratorNMRHXB";
-                    //string password = "Nmrhxb@1234";
-                    string username = "seekya";
-                    string password = "123456";
-                    #region  FTP01
-                    ////reqFtp.Credentials = new NetworkCredential("administratorNMRHXB", "Nmrhxb@1234");
+                    bool TF = MakeDir(path);
+                    if (TF)
+                    {
+                        string username = "administratorNMRHXB";
+                        string password = "Nmrhxb@1234";
+                        #region  FTP01
+                        ////reqFtp.Credentials = new NetworkCredential("administratorNMRHXB", "Nmrhxb@1234");
 
+                        ////string username = "seekya";
+                        ////string password = "123456";
 
+                        ////string pdfpathfilename = System.AppDomain.CurrentDomain.BaseDirectory + filename;
+                        ////string pdfpathfilename = @"C:\\document\\张益达.pdf";
+                        ////FileInfo fileIf = new FileInfo(pdfpathfilename);
+                        //FileInfo fileIf = new FileInfo(filename);
+                        //string uri = path + fileIf.Name;
+                        //FtpWebRequest ftpreq;
+                        ////ftpreq = (FtpWebRequest)FtpWebRequest.Create("http://172.26.147.129:21/fls/P01/" + filename);  //此文件名为服务器保存的文件名
+                        //ftpreq = (FtpWebRequest)FtpWebRequest.Create(uri);  //此文件名为服务器保存的文件名
+                        //                                                    //ftpreq.Credentials = new NetworkCredential(username, password);
+                        //ftpreq.Credentials = new NetworkCredential("administratorNMRHXB", "Nmrhxb@1234");
+                        //ftpreq.KeepAlive = false;
+                        //ftpreq.Method = WebRequestMethods.Ftp.UploadFile;
+                        //ftpreq.UseBinary = true;
+                        //ftpreq.UsePassive = false;
+                        //ftpreq.EnableSsl = true;
+                        ////ftpreq.Proxy = null;
+                        //ftpreq.ContentLength = fileIf.Length;
 
-                    ////string pdfpathfilename = System.AppDomain.CurrentDomain.BaseDirectory + filename;
-                    ////string pdfpathfilename = @"C:\\document\\张益达.pdf";
-                    ////FileInfo fileIf = new FileInfo(pdfpathfilename);
-                    //FileInfo fileIf = new FileInfo(filename);
-                    //string uri = path + fileIf.Name;
-                    //FtpWebRequest ftpreq;
-                    ////ftpreq = (FtpWebRequest)FtpWebRequest.Create("http://172.26.147.129:21/fls/P01/" + filename);  //此文件名为服务器保存的文件名
-                    //ftpreq = (FtpWebRequest)FtpWebRequest.Create(uri);  //此文件名为服务器保存的文件名
-                    //                                                    //ftpreq.Credentials = new NetworkCredential(username, password);
-                    //ftpreq.Credentials = new NetworkCredential("administratorNMRHXB", "Nmrhxb@1234");
-                    //ftpreq.KeepAlive = false;
-                    //ftpreq.Method = WebRequestMethods.Ftp.UploadFile;
-                    //ftpreq.UseBinary = true;
-                    //ftpreq.UsePassive = false;
-                    //ftpreq.EnableSsl = true;
-                    ////ftpreq.Proxy = null;
-                    //ftpreq.ContentLength = fileIf.Length;
+                        //int bufflength = 2048;
+                        //byte[] buff = new byte[bufflength];
+                        //int contentlen;
+                        //FileStream fs = fileIf.OpenRead();
+                        //try
+                        //{
+                        //    ServicePointManager.ServerCertificateValidationCallback += RemoteCertificateValidate;
+                        //    Stream st = ftpreq.GetRequestStream();
+                        //    contentlen = fs.Read(buff, 0, bufflength);
+                        //    while (contentlen != 0)
+                        //    {
+                        //        st.Write(buff, 0, contentlen);
+                        //        contentlen = fs.Read(buff, 0, bufflength);
+                        //    }
+                        //    st.Close();
+                        //    fs.Close();
+                        //}
+                        //catch (Exception e46)
+                        //{
+                        //    throw new Exception("FTP upload error:" + e46.Message + e46.StackTrace);
+                        //}
+                        #endregion
 
-                    //int bufflength = 2048;
-                    //byte[] buff = new byte[bufflength];
-                    //int contentlen;
-                    //FileStream fs = fileIf.OpenRead();
-                    //try
-                    //{
-                    //    ServicePointManager.ServerCertificateValidationCallback += RemoteCertificateValidate;
-                    //    Stream st = ftpreq.GetRequestStream();
-                    //    contentlen = fs.Read(buff, 0, bufflength);
-                    //    while (contentlen != 0)
-                    //    {
-                    //        st.Write(buff, 0, contentlen);
-                    //        contentlen = fs.Read(buff, 0, bufflength);
-                    //    }
-                    //    st.Close();
-                    //    fs.Close();
-                    //}
-                    //catch (Exception e46)
-                    //{
-                    //    throw new Exception("FTP upload error:" + e46.Message + e46.StackTrace);
-                    //}
-                    #endregion
+                        #region FTP02
+                        var client = new WebClient();
+                        client.Credentials = new NetworkCredential(username, password);
+                        FileInfo fi = new FileInfo(filename);
+                        string reportname = fi.Name;
+                        string returnpath = "";
+                        //string urlname = path + fi.Name;
+                        string urlname = path + reportname.Split('(')[1].Split(')')[0] + ".pdf";
+                        client.UploadFile(urlname, filename);
+                        returnpath = urlname;
+                        #endregion
 
-                    #region FTP02
-                    var client = new WebClient();
-                    client.Credentials = new NetworkCredential(username, password);
-                    FileInfo fi = new FileInfo(filename);
-                    string reportname = fi.Name;
-                    string returnpath = "";
-                    //string urlname = path + fi.Name;
-                    string urlname = path + reportname.Split('(')[1].Split(')')[0] + ".pdf";
-
-                    client.UploadFile(urlname, filename);
-                    returnpath = urlname;
-                    #endregion
-
-                }
+                    }
                 //}
             }
+            
         }
 
         private bool MakeDir(string path)
@@ -1235,8 +1232,8 @@ namespace Seekya
                 reqFtp.UseBinary = true;
                 // reqFtp.KeepAlive = false;
                 reqFtp.Method = WebRequestMethods.Ftp.MakeDirectory;
-                //reqFtp.Credentials = new NetworkCredential("administratorNMRHXB", "Nmrhxb@1234");  //FJ
-                reqFtp.Credentials = new NetworkCredential("seekya", "123456");  //LOCALHOST
+                reqFtp.Credentials = new NetworkCredential("administratorNMRHXB", "Nmrhxb@1234");
+                //reqFtp.Credentials = new NetworkCredential("seekya", "123456");
                 FtpWebResponse response = (FtpWebResponse)reqFtp.GetResponse();
                 response.Close();
                 return true;
@@ -1252,8 +1249,8 @@ namespace Seekya
         {
             FtpWebRequest reqFtp = (FtpWebRequest)FtpWebRequest.Create(new Uri(path));
             reqFtp.UseBinary = true;
-            //reqFtp.Credentials = new NetworkCredential("administratorNMRHXB", "Nmrhxb@1234");
-            reqFtp.Credentials = new NetworkCredential("seekya", "123456");
+            reqFtp.Credentials = new NetworkCredential("administratorNMRHXB", "Nmrhxb@1234");
+            //reqFtp.Credentials = new NetworkCredential("seekya", "123456");
 
             reqFtp.Method = WebRequestMethods.Ftp.ListDirectory;
             FtpWebResponse resFtp = null;
@@ -1279,15 +1276,15 @@ namespace Seekya
             return true;
         }
 
-        private void ZerohbRecordStored(string scanBarCode, string[] arg, int tmpValue)
+        private void ZerohbRecordStored(string scanBarCode, string arg, int tmpValue)
         {
             OleDbConnection ConnectionZerohb = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + System.AppDomain.CurrentDomain.BaseDirectory + "Data\\ZerohbRecord.mdb");
             ConnectionZerohb.Open();
             OleDbCommand commandZerohb = null;
-            string str_01 = "CREATE TABLE " + scanBarCode + "(mbodyget ntext,mbodydata ntext,mbodystate ntext,tvalue INTEGER)";
+            string str_01 = "CREATE TABLE " + scanBarCode + "(mbody ntext,tvalue INTEGER)";
             commandZerohb = new OleDbCommand(str_01, ConnectionZerohb);
             commandZerohb.ExecuteNonQuery();
-            string str_02 = "Insert into " + scanBarCode + " (mbodyget,mbodydata,mbodystate,tvalue) values ('" + arg[0] + "','" + arg[1]+"','"+arg[2]+"','"+tmpValue + "')";
+            string str_02 = "Insert into " + scanBarCode + " (mbody,tvalue) values ('" + arg + "','" + tmpValue + "')";
             commandZerohb = new OleDbCommand(str_02, ConnectionZerohb);
             commandZerohb.ExecuteNonQuery();
         }

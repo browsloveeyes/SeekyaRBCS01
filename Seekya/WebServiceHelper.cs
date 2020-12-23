@@ -18,7 +18,8 @@ namespace Seekya
 
         public static object InvokeWebService(string url, string classname, string methodname, object[] args)
         {
-            string @namespace = "EnterpriseServerBase.WebService.DynamicWebCalling";
+            //string @namespace = "EnterpriseServerBase.WebService.DynamicWebCalling";
+            string @namespace = "client";
 
             if ((classname == null) || (classname == ""))
             {
@@ -36,7 +37,7 @@ namespace Seekya
                 //XmlTextReader reader = new XmlTextReader(url + "?wsdl");
                 XmlTextReader reader = new XmlTextReader(url);
                 ServiceDescription sd = ServiceDescription.Read(reader);
-
+                classname = sd.Services[0].Name;
 
                 ServiceDescriptionImporter sdi = new ServiceDescriptionImporter();
                 sdi.AddServiceDescription(sd, "", "");
@@ -73,7 +74,6 @@ namespace Seekya
 
                 //生成代理实例，并调用方法
                 System.Reflection.Assembly assembly = cr.CompiledAssembly;
-                string x = @namespace + "." + classname;
                 Type t = assembly.GetType(@namespace + "." + classname, true, true);
                 object obj = Activator.CreateInstance(t);
                 System.Reflection.MethodInfo mi = t.GetMethod(methodname);

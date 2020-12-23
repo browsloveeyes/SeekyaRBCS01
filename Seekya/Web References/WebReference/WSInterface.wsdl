@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:tns="http://www.zysoft.com/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://www.zysoft.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsp:Policy wsu:Id="servicePolicy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <wsam:Addressing wsp:Optional="true" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata">
+          <wsp:Policy>
+            <wsam:AnonymousResponses />
+          </wsp:Policy>
+        </wsam:Addressing>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsdl:types>
+    <s:schema xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.zysoft.com/" xmlns:s="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="CallInterface">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" name="msgHeader" type="xs:string" />
+            <xs:element minOccurs="0" name="msgBody" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="CallInterfaceResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" name="CallInterfaceResult" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="CallInterfaceFault">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="payload" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="CallInterfaceRequest">
+    <wsdl:part name="parameters" element="tns:CallInterface" />
+  </wsdl:message>
+  <wsdl:message name="CallInterfaceFault">
+    <wsdl:part name="parameters" element="tns:CallInterfaceFault" />
+  </wsdl:message>
+  <wsdl:message name="CallInterfaceResponse">
+    <wsdl:part name="parameters" element="tns:CallInterfaceResponse" />
+  </wsdl:message>
+  <wsdl:portType wsp:PolicyURIs="#servicePolicy" name="WSInterfacePortType">
+    <wsdl:operation name="CallInterface">
+      <wsdl:input wsaw:Action="http://www.zysoft.com/CallInterface" message="tns:CallInterfaceRequest" />
+      <wsdl:output wsaw:Action="http://www.zysoft.com/WSInterfaceSoap/CallInterfaceResponse" message="tns:CallInterfaceResponse" />
+      <wsdl:fault wsaw:Action="http://www.zysoft.com//WSInterfacePortType/CallInterfaceFault" name="CallInterfaceFault" message="tns:CallInterfaceFault" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WSInterfaceSoap11Binding" type="tns:WSInterfacePortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsaw:UsingAddressing wsdl:required="false" />
+    <wsdl:operation name="CallInterface">
+      <soap:operation soapAction="http://www.zysoft.com/CallInterface" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="CallInterfaceFault">
+        <soap:fault use="literal" name="CallInterfaceFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="WSInterfaceSoap12Binding" type="tns:WSInterfacePortType">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsaw:UsingAddressing wsdl:required="false" />
+    <wsdl:operation name="CallInterface">
+      <soap12:operation soapAction="http://www.zysoft.com/CallInterface" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="CallInterfaceFault">
+        <soap12:fault use="literal" name="CallInterfaceFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WSInterface">
+    <wsdl:port name="WSInterfaceHttpSoap11Endpoint" binding="tns:WSInterfaceSoap11Binding">
+      <soap:address location="http://168.2.5.28:1506/services/WSInterface.WSInterfaceHttpSoap11Endpoint" />
+    </wsdl:port>
+    <wsdl:port name="WSInterfaceHttpSoap12Endpoint" binding="tns:WSInterfaceSoap12Binding">
+      <soap12:address location="http://168.2.5.28:1506/services/WSInterface.WSInterfaceHttpSoap12Endpoint" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
